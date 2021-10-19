@@ -1,0 +1,26 @@
+export STARSHIP_CONFIG=~/.config/iterm2/starship.toml
+
+export BSCS_DEV_TEAM_NPM_AUTH_TOKEN="bbb9e78f-f129-42e6-bf1b-8f752bbbef30"
+export CLICOLOR=1
+export DOCKER_GIT_CREDENTIALS=https://bscs-dev-team:d61f96d0b3932c6a056901d8d22e6b483a71f1ae@github.com
+export EDITOR=/usr/local/bin/kak
+export FAUNA_SERVER_SECRET="fnAD3wDkqyACCFVuAyZ0Wkf7lE9oCFgm80F6fQ5r"
+export FONTAWESOME_NPM_AUTH_TOKEN="A4C07AF9-A300-4AE3-9FFC-4D54A7BA41EC"
+export FZF_ALT_C_COMMAND="fd -t d . $HOME"
+export FZF_CTRL_T_COMMAND="fd -t f . $PWD"
+export FZF_DEFAULT_COMMAND="rg --files"
+export GOPATH=/Users/cyee/go:/Users/cyee/projects/golang/
+export GOPRIVATE=github.com/bscs-science-learning/*
+export NVM_DIR="$HOME/.nvm"
+export TERM=xterm-256color
+export VISUAL=/usr/local/bin/kak
+export XDG_CONFIG_HOME=$HOME/.config
+
+export PATH=$HOME/.node/bin:$PATH
+export PATH=$PATH:$HOME/.poetry/bin
+export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$GOPATH
+
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

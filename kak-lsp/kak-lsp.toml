@@ -1,0 +1,41 @@
+[language.javascript]
+filetypes = ["javascript"]
+roots = ["package.json"]
+command = "typescript-language-server"
+args = ["--stdio"]
+ 
+[language.tsx]
+filetypes = ["typescript"]
+roots = ["package.json", "tsconfig.json"]
+command = "typescript-language-server"
+args = ["--stdio"]
+
+[language.python]
+filetypes = ["python"]
+roots = ["Pipfile", ".git"]
+command = "pyls"
+
+[language.go]
+filetypes = ["go"]
+roots = ["Gopkg.toml", "go.mod", ".git"]
+command = "gopls"
+# command = "go-langserver"
+# args = ["-mode", "stdio", "gocodecompletion"]
+
+[language.json]
+filetypes = ["json"]
+roots = ["package.json"]
+command = "json-languageserver"
+args = ["--stdio"]
+
+[language.css]
+filetypes = ["css"]
+roots = ["package.json"]
+command = "css-languageserver"
+args = ["--stdio"]
+
+[language.html]
+filetypes = ["html"]
+roots = ["package.json"]
+command = "html-languageserver"
+args = ["--stdio"]
