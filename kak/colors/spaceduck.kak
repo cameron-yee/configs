@@ -12,37 +12,38 @@ evaluate-commands %sh{
     purple2dark='rgb:686f9a'
     cyan='rgb:00a3cc'
     magenta='rgb:ce6f8f'
-
-	background='rgb:0f111b'
+    background='rgb:0f111b'
     foreground='rgb:ecf0c1'
     visual='rgb:1b1c36'
     cursor='rgb:16172d'
 
     echo "
         # code
-        face global value              ${yellow}
-        face global type               ${yellow}
-        face global variable           ${cyan}
-        face global module             ${red}
-        face global function           ${green}
-        face global string             ${cyan}
-        face global keyword            ${green}
-        face global operator           ${red}
         face global attribute          ${purple}
-        face global comment            ${purpledark}
-        face global meta               ${purple2}
         face global builtin            ${orange}+b
+        face global comment            ${purple2dark}
+        face global delimiter          ${purple}
+        face global function           ${green}
+        face global identifier         ${orange}
+        face global keyword            ${green}
+        face global meta               ${purple2}
+        face global module             ${red}
+        face global operator           ${red}
+        face global string             ${cyan}
+        face global type               ${yellow}
+        face global value              ${yellow}
+        face global variable           ${cyan}
 
         # markup
-        face global title              ${green}+b
-        face global header             ${green}
-        face global bold               ${foreground}+b
-        face global italic             ${foreground}+i
-        face global mono               ${foreground}
         face global block              ${magenta}
-        face global link               ${cyan}
+        face global bold               ${foreground}+b
         face global bullet             ${yellow}
+        face global header             ${green}
+        face global italic             ${foreground}+i
+        face global link               ${cyan}
         face global list               ${orange}
+        face global mono               ${foreground}
+        face global title              ${green}+b
 
         # builtin
         face global Default            ${foreground},default
@@ -66,8 +67,9 @@ evaluate-commands %sh{
         face global StatusLineValue    ${foreground}
         face global StatusCursor       ${foreground},${background}
         face global Prompt             ${foreground}+b
-        face global MatchingChar       ${foreground},${background}+b
+        face global MatchingChar       ${purple},default+b
         face global BufferPadding      ${foreground},default
+        face global Whitespace         ${orange},default
     "
 }
 

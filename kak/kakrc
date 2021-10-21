@@ -123,21 +123,26 @@ map global user g ':enter-user-mode<space>golang<ret>' -docstring 'golang mode'
 #############################################################
 # General Kakoune settings
 ##############################################################
-colorscheme nord
+colorscheme spaceduck
 
 map global normal '#' :comment-line<ret> -docstring 'comment line'
 map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
 
-set-face global delimiter rgb:aa33aa,default
+# set-face global delimiter rgb:aa33aa,default
 
-# adds relative line numbers
 hook global WinCreate ^[^*]+$ %{
-    add-highlighter window/             number-lines -relative
-    add-highlighter window/             wrap
-    # Something wrong with one of these 2 lines
-    add-highlighter window/operators    regex (\+|-|\*|&|=|\?|%|\|!|\||->|\.|,|<|>|:|^|/|~) 0:operator
-    add-highlighter window/delimiters   regex (\(|\)|\[|\]|\{|\}|\;|;) 0:delimiter
+    add-highlighter window/             number-lines -relative -hlcursor
+    # add-highlighter window/             show-whitespaces -spc · -tab >
+    add-highlighter window/             show-matching
+    add-highlighter window/             wrap -width 80
+
+
+    add-highlighter global/delimeter regex '(\(|\)|\[|\]|\{|\}|;|,)' 0:delimiter
+    add-highlighter window/operators    regex '(\+|-|\*|&|=|\?|%|\|!|\||->|\.|<|>|:|^|/|~)' 0:operator
 }
+
+# Global highlighters
+add-highlighter global/trailing   regex '[ \t\f\v]+$' 0:Whitespace
 
 # open fzf-file if kak is opened without a file argument
 hook -once global WinDisplay \*scratch\* %{
@@ -195,4 +200,3 @@ hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json|pytho
         exec -draft '%s\h+$<ret>d'
     }
 }
-
