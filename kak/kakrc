@@ -1,9 +1,97 @@
-# set up plugin manager
-source "%val{config}/plugins/plug.kak/rc/plug.kak"
+#############################################################
+# Global Kakoune settings
+##############################################################
+colorscheme spaceduck
+
+map global normal '#' :comment-line<ret> -docstring 'comment line'
+map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
+
+# highlight trailing whitespace
+set-face global TrailingWhitespace default,bright-magenta
+add-highlighter global/ regex '[ \h]+$' 0:TrailingWhitespace
+
+# highlight special comment words
+add-highlighter global/ regex \b(TODO|FIXME|XXX|NOTE)\b 0:yellow,black 1:black,yellow
+
+set-option global indentwidth 4
+set-option global tabstop 4
+
+#############################################################
+# Hook settings
+##############################################################
+hook global WinCreate ^[^*]+$ %{
+    add-highlighter window/             number-lines -relative -hlcursor
+    add-highlighter window/             show-matching
+    add-highlighter window/             wrap -width 80
+
+
+    add-highlighter global/delimeter regex '(\(|\)|\[|\]|\{|\}|;|,)' 0:delimiter
+    add-highlighter window/operators regex '(\+|-|\*|&|=|\?|%|\|!|\||->|\.|<|>|:|^|/|~)' 0:operator
+}
+
+# open fzf-file if kak is opened without a file argument
+hook -once global WinDisplay \*scratch\* %{
+    require-module fzf
+    require-module fzf-file
+    execute-keys '<esc>: fzf-file<ret>'
+}
+
+# map jk to <esc>
+hook global InsertChar k %{ try %{
+    exec -draft hH <a-k>jk<ret> d
+    exec <esc>
+}}
+
+# sets tabs to 8 spaces for go
+hook global WinSetOption filetype=go %{
+    set-option window indentwidth 8
+    set-option window tabstop 8
+}
+
+# sets tabs to 2 spaces for certain file types
+hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json|scss) %{
+    set-option window indentwidth 2
+    set-option window tabstop 2
+}
+
+hook global WinSetOption filetype=(javascript|typescript|vue|json) %{
+    set global lintcmd '/Users/fme2202/projects/node_modules/.bin/eslint --config=/Users/fme2202/projects/.eslintrc.js --format=/Users/fme2202/projects/node_modules/eslint-formatter-kakoune'
+
+    eval 'lint-buffer'
+
+    hook buffer BufWritePost .* %{
+        lint
+    }
+
+}
+
+#############################################################
+# Switch to alternate file (e.g. from Foo.js -> Foo.test.js)
+# rip off of https://github.com/chriswalker/golang.kak/blob/master/rc/golang.kak
+#############################################################
+hook global WinSetOption filetype=javascript %{
+    define-command js-alternate -docstring "Switch to alternate JS file" %{
+        evaluate-commands %sh{
+            case $kak_bufname in
+                *.test.js)
+                    altfile=${kak_bufname%.test.js}.js
+                ;;
+                *.js)
+                    altfile=${kak_bufname%.js}.test.js
+                ;;
+            esac
+            test ! -f $altfile && echo "fail '$altfile not found'" && exit
+               printf "%s\n" "edit ${altfile}"
+        }
+    }
+}
 
 #############################################################
 # Plug settings
 #############################################################
+
+# set up plugin manager
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
 
 plug "https://gitlab.com/FlyingWombat/case.kak"
 map global normal '`' ': enter-user-mode<space>case<ret>'
@@ -35,8 +123,12 @@ plug 'jordan-yee/kakoune-git-mode' config %{
 plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
 } config %{
-    hook global WinSetOption filetype=(markdown|javascript|typescript|python|css) expandtab
-    hook global WinSetOption filetype=(makefile|go) noexpandtab
+    hook global WinSetOption filetype=(markdown|javascript|typescript|python|css) %{
+    expandtab
+    }
+    hook global WinSetOption filetype=(makefile|go) %{
+        noexpandtab
+    }
 }
 
 #############################################################
@@ -48,12 +140,12 @@ plug "andreyorst/fzf.kak" config %{
     # set global fzf_file_command 'rg'
     set global fzf_file_command 'fd --hidden --type f --exclude .git --exclude node_modules'
     set global fzf_highlight_command 'bat'
-    
+
     define-command dbf -docstring 'delete buffer and open fzf-file' %{
         execute-keys ': delete-buffer<ret>'
         execute-keys '<esc>: fzf-file<ret>'
     }
-    
+
     define-command wf -docstring 'write buffer and close and open fzf-file' %{
         execute-keys ': write<ret>'
         execute-keys ': delete-buffer<ret>'
@@ -65,25 +157,36 @@ plug "andreyorst/fzf.kak" config %{
 
 #############################################################
 # LSP settings
-# Not set up correctly yet
+# NOTE: this is locked to v11.0.1 b/c of a mismatch between the version
+# downloaded by plug.kak and rc/lsp.rc.
 #############################################################
-plug "ul/kak-lsp" do %{
-    cargo build --release --locked
-    cargo install --force --path .
+plug "kak-lsp/kak-lsp" tag "v11.0.1" do %{
+    cargo install --locked --force --path .
 } config %{
-define-command ne -docstring 'go to next error/warning from lsp' %{ lsp-find-error --include-warnings }
-    define-command pe -docstring 'go to previous error/warning from lsp' %{ lsp-find-error --previous --include-warnings }
-    define-command ee -docstring 'go to current error/warning from lsp' %{ lsp-find-error --include-warnings; lsp-find-error --previous --include-warnings }
+    hook global WinSetOption filetype=(javascript|typescript|go|python|css|scss|html|json) %{
+        map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
 
+        lsp-enable-window
+        lsp-auto-hover-enable
 
-    hook global WinSetOption filetype=(javascript|typescript|go|python|css|html|json) %{
-        # set-option window lsp_auto_highlight_references true
         set-option window lsp_hover_anchor false
         set-option window lsp_hover_max_lines 10
-        lsp-auto-hover-enable
+
+        set-face window DiagnosticError red,default+i
+        set-face window DiagnosticHint yellow,default+i
+        set-face window DiagnosticWarning default+u
+
         echo -debug "Enabling LSP for filetype %opt{filetype}"
-        lsp-enable-window
     }
+
+    #############################################################
+    # Add the following flag for debugging
+    # --log ~/.config/kak-lsp/kak-lsp.log
+    #############################################################
+    set-option global lsp_cmd "kak-lsp -vvv -c ~/.config/kak-lsp/kak-lsp.toml -s %val{session}"
+
+    # for python. Can't configure python in kak-lsp.toml.
+    set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
 
     hook global KakEnd .* lsp-exit
 }
@@ -91,16 +194,6 @@ define-command ne -docstring 'go to next error/warning from lsp' %{ lsp-find-err
 plug "cameron-yee/kak-prints" config %{
     map global user p ':enter-user-mode<space>prints<ret>' -docstring 'print statement mode'
 }
-
-# For debugging. Isn't working without this.
-set-option global lsp_cmd "kak-lsp -vvv -c ~/.config/kak-lsp/kak-lsp.toml -s %val{session} --log ~/.config/kak-lsp/kak-lsp.log"
-
-# for python. Can't configure python in kak-lsp.toml.
-set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
-#############################################################
-# End plug settings
-#############################################################
-
 
 #############################################################
 # User modes
@@ -119,84 +212,14 @@ map global golang i ':gopls imports<ret>' -docstring 'update imports'
 map global golang r ':go-coverage<ret>:go-coverage<ret>' -docstring 'refresh go-coverage'
 map global user g ':enter-user-mode<space>golang<ret>' -docstring 'golang mode'
 
+declare-user-mode javascript
+map global javascript a ':js-alternate<ret>' -docstring 'js-alternate'
+map global user j ':enter-user-mode<space>javascript<ret>' -docstring 'javascript mode'
 
-#############################################################
-# General Kakoune settings
-##############################################################
-colorscheme spaceduck
-
-map global normal '#' :comment-line<ret> -docstring 'comment line'
-map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
-
-# set-face global delimiter rgb:aa33aa,default
-
-hook global WinCreate ^[^*]+$ %{
-    add-highlighter window/             number-lines -relative -hlcursor
-    # add-highlighter window/             show-whitespaces -spc · -tab >
-    add-highlighter window/             show-matching
-    add-highlighter window/             wrap -width 80
-
-
-    add-highlighter global/delimeter regex '(\(|\)|\[|\]|\{|\}|;|,)' 0:delimiter
-    add-highlighter window/operators    regex '(\+|-|\*|&|=|\?|%|\|!|\||->|\.|<|>|:|^|/|~)' 0:operator
-}
-
-# Global highlighters
-add-highlighter global/trailing   regex '[ \t\f\v]+$' 0:Whitespace
-
-# open fzf-file if kak is opened without a file argument
-hook -once global WinDisplay \*scratch\* %{
-    require-module fzf
-    require-module fzf-file
-    execute-keys '<esc>: fzf-file<ret>'
-}
-
-# hook global BufNewFile ^[^*]+$ %{
-# works with all file names, but not just diff
-# 
-# hook global WinCreate ^diff$ %{
-#     # https://github.com/jordan-yee/kakoune-git-mode/blob/master/git-mode.kak
-#     require-module git-mode
-#     execute-keys '<esc>: git-mode-diff<ret>'
-#     execute-keys '<esc>: delete-buffer diff<ret>'
-# }
-
-
-# Key mappings
-# map jk to <esc>
-hook global InsertChar k %{ try %{
-    exec -draft hH <a-k>jk<ret> d
-    exec <esc>
-}}
-
-#############################################################
-# indentation settings
-#############################################################
-set-option global indentwidth 4
-set-option global tabstop 4
-
-# sets tabs to 8 spaces for go
-hook global WinSetOption filetype=go %{
-    set-option window indentwidth 8 
-    set-option window tabstop 8
-}
-
-# sets tabs to 2 spaces for certain file types
-hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json) %{
-    set-option window indentwidth 2 
-    set-option window tabstop 2
-    
-    set buffer lintcmd './node_modules/.bin/eslint --format=node_modules/eslint-formatter-kakoune -c .eslintrc.js'
-    lint-enable
-    
-    hook buffer BufWritePre .* %{
-        lint
-    }
-}
-
-# no idea what this was for
-hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json|python|c) %{
-    hook buffer BufWritePre .* %{
-        exec -draft '%s\h+$<ret>d'
-    }
-}
+declare-user-mode lint
+map global lint b ':buffer<space>*lint-output*<ret>' -docstring 'open *lint-output* buffer'
+map global lint l ':lint<ret>' -docstring 'lint'
+map global lint n ':lint-next-message<ret>' -docstring 'lint-next-message'
+map global lint p ':lint-previous-message<ret>' -docstring 'lint-previous-message'
+map global lint e ':enter-user-mode<space>-lock<space>lint<ret>' -docstring 'lock lint mode'
+map global user e ':enter-user-mode<space>lint<ret>' -docstring 'lint mode'
