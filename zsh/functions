@@ -1,152 +1,10 @@
-#################################################################################################################################
-# MY ACTIVE FUNCTIONS
-#################################################################################################################################
-
-# Override man command
-function man() {
-    kak -e "man $1"
+function pbcat() {
+	cat $1 | pbcopy
 }
 
-# Launches pipenv shell environment for CAPI
-function start_capi() {
-  cd ~/projects/python/capi
-  pipenv shell
-}
-
-function sdrive() {
-    mount_smbfs //cyee@red-queen/biome/shared ~/sdrive
-    cd ~/sdrive/
-}
-
-# Don't worry about it
-function cmp() {
-  printf 'f4&U{@h:)@++`cj$Tqv?L6F$sA~bav<QNa>YU~YD.{.M*{,q"-' | pbcopy
-}
-
-# docker-compose functions
-function dcd() {
-    if [ $# -eq 0 ]
-        then
-	    docker-compose -f .docker/dev/dev.docker-compose.yml down
-    else
-        docker-compose -f $1 down
-    fi
-}
-
-function dcb() {
-    if [ $# -eq 0 ]
-        then
-	    docker-compose -f .docker/dev/dev.docker-compose.yml build
-    else
-        docker-compose -f $1 build
-    fi
-}
-
-function dcu() {
-    if [ $# -eq 0 ]
-        then
-	    docker-compose -f .docker/dev/dev.docker-compose.yml up
-    else
-        docker-compose -f $1 up
-    fi
-}
-
-function dcud() {
-    if [ $# -eq 0 ]
-        then
-	    docker-compose -f .docker/dev/dev.docker-compose.yml up -d
-    else
-        docker-compose -f $1 up -d
-    fi
-}
-
-function dcall() {
-    if [ $# -eq 0 ]
-	then docker-compose -f .docker/dev/dev.docker-compose.yml down
-            docker-compose -f .docker/dev/dev.docker-compose.yml build
-            docker-compose -f .docker/dev/dev.docker-compose.yml up
-    else
-        docker-compose -f $1 down
-        docker-compose -f $1 build
-        docker-compose -f $1 up
-    fi
-}
-# end dc functions
-
-function bscscolors() {
-    imgcat ~/Pictures/bscs_colors.png
-}
-
-function pnav() {
-    echo "**********************"
-    PS3="Go to project: "
-    select i in none misc_scripts js c whiteboardproblems
-    do
-        case $i,$REPLY in
-            none,*|*,none)
-                break
-                ;;
-            misc_scripts,*|*,misc_scripts)
-                cd ~/Documents/misc/misc_scripts;
-                break
-                ;;
-            js,*|*,js)
-                cd ~/Documents/practice/js;
-                break
-                ;;
-            c,*|*,c)
-                cd ~/Documents/practice/c;
-                break
-                ;;
-            whiteboardproblems,*|*,whiteboardproblems)
-                cd ~/Documents/practice/js/whiteboardproblems;
-                break
-                ;;
-        esac
-    done
-    clear
-}
-
-function nav() {
-    echo "**********************"
-    PS3="Go to project: "
-    select i in none projects bmw canvas capi flask golang
-    do
-        case $i,$REPLY in
-            none,*|*,none)
-                break
-                ;;
-            projects,*|*,projects)
-                cd ~/projects;
-                break
-                ;;
-            bmw,*|*,bmw)
-                cd ~/projects/js/gatsby/bmw;
-                break
-                ;;
-            canvas,*|*,canvas)
-                cd ~/projects/html/canvas;
-                break
-                ;;
-            capi,*|*,capi)
-                cd ~/projects/python/capi;
-                break
-                ;;
-            flask,*|*,flask)
-                cd ~/projects/python/flask;
-                break
-                ;;
-            golang,*|*,golang)
-                cd ~/projects/golang/;
-                break
-                ;;
-        esac
-    done
-    clear
-}
-
-function bv() {
-    curl 'https://beta.ourmanna.com/api/v1/get/?format=text&order=random'
+function notes() {
+    builtin cd ~/notes
+    fuz
 }
 
 function sz() {
@@ -154,136 +12,104 @@ function sz() {
     clear
 }
 
-function kzk() {
-    kak $(fzf)
-}
-
-function grepre() {
-    grep -R -e $1 .
-}
-
-function notes() {
-    cd ~/Documents/notes
-    fuz
-}
-
-function network() {
-    osascript -e 'tell application "System Preferences"' -e 'activate' -e 'set current pane to pane "com.apple.preference.network"' -e 'end'
-}
-
 function take() {
     mkdir $1
-    cd $1
+    builtin cd $1
 }
 
-function cd() {
-    builtin cd "$@"
-    if [[ "$PWD" == *"golang"* ]]; then
-        osascript ~/Documents/misc/config_files/changeITermBackgroundImage.scpt ~/Pictures/sci-fi/sci-fi5.jpg
-        return
-    fi
+function pbemail() {
+    echo "cameronyee@northwesternmutual.com" | pbcopy
+}
 
-    if [[ "$PWD" == *"js"* ]]; then
-        osascript ~/Documents/misc/config_files/changeITermBackgroundImage.scpt ~/Pictures/sci-fi/steamland.png
-        return
-    fi
+function tmuxmain() {
+    builtin cd ~/projects/luna/
 
-    if [[ "$PWD" == *"python"* ]]; then
-        osascript ~/Documents/misc/config_files/changeITermBackgroundImage.scpt ~/Pictures/sci-fi/sci-fi7.jpeg
-        return
-    fi
+	tmux new-session -d -s main
+	tmux send-keys -t main notes ENTER
+	tmux new-window -t main
+	tmux select-window -t main -t 0
 
-    if [[ "$PWD" == *"projects"* ]]; then
-        osascript ~/Documents/misc/config_files/changeITermBackgroundImage.scpt ~/Pictures/sci-fi/sci-fi2.jpg
-        return
-    fi
+	tmux a -t main
 }
 
 function gtop() {
-	top=$(git rev-parse --show-toplevel)
-	cd $top
+    top=$(git rev-parse --show-toplevel)
+	builtin cd $top
 }
 
-function def() {
-	curl dict://dict.org/d:"$1"
+function cdp() {
+    builtin cd ~/projects
 }
 
-function gitcpr() {
-	pr=$(gh pr list | fzf | sed -E 's/^([0-9]+).*$/\1/')
-
-	if [ -n "$pr" ]; then
-		gh pr checkout "$pr"
-	fi
+function cdll() {
+    builtin cd $1 && ll
 }
 
-function pbcat() {
-	cat $1 | pbcopy
-}
-
-function gitcm() {
-	nice -n 0 $(git commit -m "$1")
-}
-
-function gitendpr() {
-	current=$(git branch --show-current)
-	default=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
-	
-	git checkout "$default"
-	git pull origin "$default"
-	git branch -d "$current"
-}
-
-#################################################################################################################################
-# END MY ACTIVE FUNCTIONS
-#################################################################################################################################
-
-#################################################################################################################################
-# MY TESTING FUNCTIONS
-#################################################################################################################################
-
-function testpymail() {
-    curl --location --request POST 'https://pymail.bscs.org/form' \
-    --header 'Content-Type: application/json' \
-    --data-raw '{
-        "form_name": "TestForm",
-        "sendto": ["Cameron Yee"],
-        "first_name": "Cameron"
-    }'
-}
-
-#################################################################################################################################
-# END MY TESTING FUNCTIONS
-#################################################################################################################################
-
-#################################################################################################################################
-# NOT SURE WHAT FUNCTIONS
-#################################################################################################################################
-
-function volume() {
-    if [ $# -eq 0 ]; then
-        echo "Provide a volume level from 0-10"
-    else
-        osascript -e "set Volume $1"
+function back() {
+    num=1
+    if [ $# -ne 0 ]; then
+      num=$1
     fi
-}
 
-
-function get_batt() {
-    while true
+    for ((i = 0; i < $num; i++));
     do
-        battery_percentage=$(pmset -g batt | egrep "([0-9]+)\%.*" -o --colour=auto | cut -f1 -d'%')
-        if [ $battery_percentage -lt 10 ]
-        then
-            echo true
-            ~/Documents/practice/c/battery_is_low/battery_is_low
-        else
-            sleep 60
-        fi
+      builtin cd ..
     done
 }
 
+function nvmu() {
+    nvm use $1
+}
 
-#################################################################################################################################
-# END NOT SURE WHAT FUNCTIONS
-#################################################################################################################################
+function man() {
+    kak -e "man $1"
+}
+
+function llt() {
+    if [ $# -eq 0 ]; then
+        exa -a --tree --level=2
+    else
+        exa -a --tree --level=$1
+    fi
+}
+
+function d2t() {
+    docx2txt.sh $1
+}
+
+function glabmr() {
+    mr=$(glab mr list --assignee=fme2202 | fzf | sed -E 's/^!([0-9]+).*$/\1/')
+
+    if [ -n "$mr" ]; then
+    	glab mr checkout "$mr"
+	fi
+}
+
+function kakc() {
+    session=$(kak -l | fzf)
+
+    if [ -n "$session" ]; then
+        kak -c "$session"
+    fi
+}
+
+function nuke() {
+    rm yarn.lock && yarn cache clean && yarn _:clean && mv node_modules _nm && rm -rf _nm & yarn install
+}
+
+function minutes() {
+    echo "$1 / 60" | bc
+}
+
+function lower() {
+    typeset -l value
+    value=$1
+    echo $value
+}
+
+function upper() {
+    typeset -u value
+    value=$1
+    echo $value
+}
 
