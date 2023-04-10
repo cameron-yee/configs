@@ -1,82 +1,33 @@
 # ITerm2
+
 alias ..='cd ..'
-# alias ll='colorls -lA --sd --gs'
-alias ll='ls -al'
-alias lll='ls -l'
-alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
-alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
+
+# Unix
+
+# alias ll='ls -alG'
+alias lll='ls -lG'
 alias c='clear &&'
 
-# Navigation
-alias canvas='cd ~/projects/html/canvas'
+alias ll='exa -al --git --no-user'
+alias lld='exa -ald */ --git --no-user'
 
+## MacOS
 
-# Python executables
-alias python3=/usr/local/opt/python@3.9/libexec/bin/python
-alias capi='python3 ~/projects/python/capi/src/main.py'
-alias bullwinkle='python3 ~/projects/python/bullwinkle/main.py'
-
-# Rust executables
-alias days_until="~/projects/rust/days_until/target/release/days_until"
+alias showFiles='defaults write com.apple.finder AppleShowAllFiles YES; killall Finder /System/Library/CoreServices/Finder.app'
+alias hideFiles='defaults write com.apple.finder AppleShowAllFiles NO; killall Finder /System/Library/CoreServices/Finder.app'
 
 # Git
+
 alias gitaa='git add --all'
-# alias gitcm='git commit -m'
+alias gitcm='git commit -m'
 alias gits='git status'
 alias gitcb='git checkout -b'
 alias gitdb='git branch -d'
-alias gho='~/projects/shell/current-github-in-web.sh'
-
-alias nano='kak'
-alias emacs='kak'
-
-# Running programs
-alias ranger='ranger --choosedir=$HOME/.rangerdir; LASTDIR=`cat $HOME/.rangerdir`; cd "$LASTDIR"'
-alias chrome="open -a 'Google Chrome'"
-alias google="open -a 'Google Chrome'"
-alias excel="open -a '/Applications/Microsoft Excel.app/'"
-alias word="open -a '/Applications/Microsoft Word.app/'"
-alias drawio="open -a '/Applications/draw.io.app/'"
 
 # Gatsby
+
 alias gatd="gatsby develop"
 alias gatb="gatsby build"
 alias gatc="gatsby clean"
 alias gats="gatsby serve"
 alias gatcb="gatsby clean && gatsby build"
-
-# Misc
-alias klocal='kill $(lsof -t -i:8000)'
-alias d2t='/usr/local/bin/docx2txt.sh'
-alias sz='source ~/.zshrc'
-alias bfg="java -jar ~/projects/java/bfg-1.13.1.jar"
-
-#SSH crap
-alias ssh-old-php='ssh -i /Users/cyee/.ssh/bscs-prod-php.pem ubuntu@prod-php.bscs.org'
-alias ssh-old-python='ssh -i ~/.ssh/id_rsa ubuntu@prod-python.bscs.org'
-
-alias ssh-allergies='ssh allergies@prod-php.bscs.org'
-alias ssh-mstl='ssh mstl@prod-php.bscs.org'
-alias ssh-hlit='ssh hlit@hlit.bscs.org'
-alias ssh-canvanav='ssh canvanav@canvanav.bscs.org'
-
-alias ssh-python='ssh bscs@142.93.22.113'
-alias ssh-python-root='ssh root@142.93.22.113'
-
-alias ssh-media='ssh bscs@138.68.8.19'
-alias ssh-media-root='ssh root@138.68.8.19'
-
-alias ssh-static='ssh bscs@206.189.73.109'
-alias ssh-static-root='ssh root@206.189.73.109'
-
-alias ssh-shiny='ssh bscs@104.248.183.17'
-alias ssh-shiny-root='ssh root@104.248.183.17'
-
-alias ssh-php='ssh bscs@165.227.8.102'
-alias ssh-php-root='ssh root@165.227.8.102'
-
-alias ssh-node='ssh bscs@157.230.155.82'
-alias ssh-node-root='ssh root@157.230.155.82'
-
-alias ssh-aaas='ssh bscs@159.65.109.146'
-alias ssh-aaas-root='ssh root@159.65.109.146'
