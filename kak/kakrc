@@ -1,7 +1,7 @@
 #############################################################
 # Global Kakoune settings
 ##############################################################
-colorscheme spaceduck
+colorscheme pastel
 
 map global normal '#' :comment-line<ret> -docstring 'comment line'
 map global normal '<a-#>' :comment-block<ret> -docstring 'comment block'
@@ -22,11 +22,14 @@ set-option global tabstop 4
 hook global WinCreate ^[^*]+$ %{
     add-highlighter window/             number-lines -relative -hlcursor
     add-highlighter window/             show-matching
-    add-highlighter window/             wrap -width 80
 
 
     add-highlighter global/delimeter regex '(\(|\)|\[|\]|\{|\}|;|,)' 0:delimiter
     add-highlighter window/operators regex '(\+|-|\*|&|=|\?|%|\|!|\||->|\.|<|>|:|^|/|~)' 0:operator
+}
+
+define-command wrap -docstring "Wrap text output at 80 columns" %{
+    add-highlighter window/ wrap -width 80
 }
 
 # open fzf-file if kak is opened without a file argument
@@ -55,7 +58,7 @@ hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json|scss)
 }
 
 hook global WinSetOption filetype=(javascript|typescript|vue|json) %{
-    set global lintcmd '/Users/fme2202/projects/node_modules/.bin/eslint --config=/Users/fme2202/projects/.eslintrc.js --format=/Users/fme2202/projects/node_modules/eslint-formatter-kakoune'
+    set global lintcmd '/Users/fme2202/projects/global-eslint/node_modules/.bin/eslint --config=/Users/fme2202/projects/global-eslint/.eslintrc.js --format=/Users/fme2202/projects/global-eslint/node_modules/eslint-formatter-kakoune'
 
     eval 'lint-buffer'
 
@@ -64,6 +67,53 @@ hook global WinSetOption filetype=(javascript|typescript|vue|json) %{
     }
 
 }
+
+hook global WinSetOption filetype=python %{
+    set global lintcmd "flake8 --filename='*' --format='%%(path)s:%%(row)d:%%(col)d: error: %%(text)s' --ignore=E121,E123,E126,E226,E242,E704,W503,W504,E501,E221,E127,E128,E129,F405"
+
+    eval 'lint-buffer'
+
+    hook buffer BufWritePost .* %{
+        lint
+    }
+}
+
+hook global WinSetOption filetype=sh %{
+    set-option window lintcmd "shellcheck -fgcc -Cnever"
+
+    eval 'lint-buffer'
+
+    hook buffer BufWritePost .* %{
+        lint
+    }
+}
+
+hook global WinSetOption filetype=json %{
+    set-option window lintcmd %{ run() { cat -- "$1" | jq 2>&1 | awk -v filename="$1" '/ at line [0-9]+, column [0-9]+$/ { line=$(NF - 2); column=$NF; sub(/ at line [0-9]+, column [0-9]+$/, ""); printf "%s:%d:%d: error: %s", filename, line, column, $0; }'; } && run }
+
+    eval 'lint-buffer'
+
+    hook buffer BufWritePost .* %{
+        lint
+    }
+}
+
+
+# hook global WinSetOption filetype=yaml %{
+#     set-global lintcmd %{
+#         run() {
+#     	    echo -debug "$1"
+#     	    echo -debug "h3"
+#             yamllint -f parsable "$1" | sed 's/ \[\(.*\)\] / \1: /'
+#         } && run
+#     }
+
+#     eval 'lint-buffer'
+
+#     hook buffer BufWritePost .* %{
+#         lint
+#     }
+# }
 
 #############################################################
 # Switch to alternate file (e.g. from Foo.js -> Foo.test.js)
@@ -112,6 +162,8 @@ plug "h-youhei/kakoune-surround" config %{
 }
 
 plug 'jordan-yee/kakoune-git-mode' config %{
+    declare-git-mode
+
     map global user v ': enter-user-mode git<ret>' -docstring "git mode"
 }
 
@@ -124,7 +176,7 @@ plug "andreyorst/smarttab.kak" defer smarttab %{
     set-option global softtabstop 4
 } config %{
     hook global WinSetOption filetype=(markdown|javascript|typescript|python|css) %{
-    expandtab
+        expandtab
     }
     hook global WinSetOption filetype=(makefile|go) %{
         noexpandtab
@@ -157,10 +209,8 @@ plug "andreyorst/fzf.kak" config %{
 
 #############################################################
 # LSP settings
-# NOTE: this is locked to v11.0.1 b/c of a mismatch between the version
-# downloaded by plug.kak and rc/lsp.rc.
 #############################################################
-plug "kak-lsp/kak-lsp" tag "v11.0.1" do %{
+plug "kak-lsp/kak-lsp" do %{
     cargo install --locked --force --path .
 } config %{
     hook global WinSetOption filetype=(javascript|typescript|go|python|css|scss|html|json) %{
