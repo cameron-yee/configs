@@ -1,4 +1,5 @@
 add_newline = false
+command_timeout = 1000
 
 [character]
 success_symbol = "[I](bold green) "
@@ -15,3 +16,7 @@ symbol = "G "
 [python]
 symbol = "P "
 
+# [custom.sprints]
+# command = "sprints"
+# style = "bold red"
+# when = true

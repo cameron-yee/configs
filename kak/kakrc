@@ -1,6 +1,17 @@
 #############################################################
 # Global Kakoune settings
 ##############################################################
+eval %sh{ kak-tree-sitter -dks --session $kak_session }
+
+hook global BufSetOption kts_lang=(javascript|typescript) %{
+    eval %sh{
+        case $kak_bufname in
+            (*\.jsx) echo "set-option buffer kts_lang javascript";;
+            (*\.tsx) echo "set-option buffer kts_lang javascript";;
+        esac
+    }
+}
+
 colorscheme pastel
 
 map global normal '#' :comment-line<ret> -docstring 'comment line'
