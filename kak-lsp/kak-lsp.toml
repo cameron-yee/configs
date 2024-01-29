@@ -1,40 +1,53 @@
-[language.javascript]
+[language_ids]
+javascript = "javascriptreact"
+typescript = "typescriptreact"
+
+[language_server.javascript]
 filetypes = ["javascript"]
 roots = ["package.json"]
 command = "typescript-language-server"
 args = ["--stdio"]
- 
-[language.tsx]
-filetypes = ["typescript"]
+
+[language_server.tsx]
+filetypes = ["javascript", "typescript"]
 roots = ["package.json", "tsconfig.json"]
 command = "typescript-language-server"
 args = ["--stdio"]
 
-[language.python]
+[language_server.tailwindcss]
+filetypes = ["javascript", "typescript"]
+roots = ["tailwind.config.ts", "tailwind.config.js"]
+command = "tailwindcss-language-server"
+args = ["--stdio"]
+[language_server.tailwindcss.settings.tailwindcss]
+editor.colorDecorators = false
+editor.quickSuggestions.strings = "on"
+
+[language_server.python]
 filetypes = ["python"]
 roots = ["Pipfile", ".git"]
 command = "pyls"
 
-[language.go]
+[language_server.go]
 filetypes = ["go"]
 roots = ["Gopkg.toml", "go.mod", ".git"]
 command = "gopls"
 # command = "go-langserver"
 # args = ["-mode", "stdio", "gocodecompletion"]
 
-[language.json]
+[language_server.json]
 filetypes = ["json"]
 roots = ["package.json"]
 command = "json-languageserver"
 args = ["--stdio"]
 
-[language.css]
+[language_server.css]
 filetypes = ["css"]
 roots = ["package.json"]
 command = "css-languageserver"
 args = ["--stdio"]
 
-[language.html]
+[language_server.html]
 filetypes = ["html"]
 roots = ["package.json"]
 command = "html-languageserver"
