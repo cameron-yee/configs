@@ -1,4 +1,5 @@
 eval "$(starship init zsh)"
+eval "$(pyenv init --path)"
 
 # vim mode
 bindkey -v
@@ -27,8 +28,18 @@ else
     print "File not found: ~/.zsh/functions"
 fi
 
-#For renaming files that are saved in Downloads directory
-(fswatch -om fsevents_monitor ~/Downloads | xargs -n1 ~/Documents/misc/misc_scripts/rename_files.py || true) &!
+# For renaming files that are saved in Downloads directory
+# (fswatch -om fsevents_monitor ~/Downloads | xargs -n1 ~/Documents/misc/misc_scripts/rename_files.py || true) &!
 
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+fpath=("$HOME/.zsh/completions" $fpath)
+
+# init autocomplete
+autoload -U compinit; compinit
+
+# enable cdr
+autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
+add-zsh-hook chpwd chpwd_recent_dirs
+zstyle ':completion:*:*:cdr:*:*' menu selection
