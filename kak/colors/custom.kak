@@ -17,7 +17,6 @@ declare-option str purple "rgb:966fd6"
 declare-option str bright_purple "rgb:c173ff"
 declare-option str pink "rgb:f984e5"
 
-# declare-option str background "%opt{mint}+d"
 declare-option str background "rgb:112630"
 declare-option str background2 "rgb:112630"
 declare-option str foreground "%opt{green}"

@@ -1,4 +1,4 @@
-#############################################################
+##############################################################
 # Global Kakoune settings
 ##############################################################
 eval %sh{ kak-tree-sitter -dks --session $kak_session }
@@ -35,10 +35,21 @@ define-command wrap -docstring "Wrap text output at 80 columns" %{
 }
 
 # map jk to <esc>
+# update colorscheme for normal mode
 hook global InsertChar k %{ try %{
     exec -draft hH <a-k>jk<ret> d
     exec <esc>
+    set-face window Default "%opt{foreground},rgb:112630"
+    set-face window LineNumbers "%opt{grey4},rgb:112630"
+    set-face window BufferPadding "rgb:112630,rgb:112630"
 }}
+
+# update colorscheme for insert mode
+hook global ModeChange push:[^:]*:insert %{
+    set-face window Default "%opt{foreground},rgb:011627"
+    set-face window LineNumbers "%opt{grey4},rgb:011627"
+    set-face global BufferPadding "rgb:011627,rgb:011627"
+}
 
 # sets tabs to 8 spaces for go
 hook global WinSetOption filetype=go %{
@@ -47,13 +58,13 @@ hook global WinSetOption filetype=go %{
 }
 
 # sets tabs to 2 spaces for certain file types
-hook global WinSetOption filetype=(javascript|typescript|vue|markdown|json|scss) %{
+hook global WinSetOption filetype=(javascript|typescript|markdown|json|scss) %{
     set-option window formatcmd "prettier %val{buffile} --write"
     set-option window indentwidth 2
     set-option window tabstop 2
 }
 
-hook global WinSetOption filetype=(javascript|typescript|vue|json) %{
+hook global WinSetOption filetype=(javascript|typescript|json) %{
     set-option global kak_log_log_fn 'console.log'
     set-option global kak_log_execute_command 'node'
 
