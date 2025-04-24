@@ -52,3 +52,8 @@ filetypes = ["html"]
 roots = ["package.json"]
 command = "html-languageserver"
 args = ["--stdio"]
+
+[language_server.yaml]
+filetypes = ["yaml"]
+command = "yaml-language-server"
+args = ["--stdio"]

@@ -206,7 +206,7 @@ plug "andreyorst/fzf.kak" config %{
 plug "kak-lsp/kak-lsp" do %{
     cargo install --locked --force --path .
 } config %{
-    hook global WinSetOption filetype=(javascript|typescript|go|python|css|scss|html|json) %{
+    hook global WinSetOption filetype=(javascript|typescript|go|python|css|scss|html|json|yaml) %{
         map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
 
         lsp-enable-window
