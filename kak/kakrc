@@ -167,7 +167,7 @@ plug 'cameron-yee/kak-log' config %{
     declare-user-mode log
 
     map global log l ':kak-log<ret>' -docstring 'add log statement for the current selection'
-    map global log e ':kak-execute-file<ret>' -docstring 'run command and output stdout to a new buffer'
+    map global log e ':kak-execute-file' -docstring 'run command and output stdout to a new buffer'
     map global user d ':enter-user-mode<space>log<ret>' -docstring 'log'
 }
 
