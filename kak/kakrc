@@ -51,6 +51,37 @@ hook global ModeChange push:[^:]*:insert %{
     set-face global BufferPadding "rgb:011627,rgb:011627"
 }
 
+#############################################################
+    # LSP settings
+#############################################################
+eval %sh{kak-lsp}
+hook global WinSetOption filetype=(rust|javascript|typescript|go|python|css|scss|html|json|yaml) %{
+    map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
+
+    lsp-enable-window
+    lsp-auto-hover-enable
+
+    set-option window lsp_hover_anchor false
+    set-option window lsp_hover_max_lines 10
+
+    set-face window DiagnosticError red,default+i
+    set-face window DiagnosticHint yellow,default+i
+    set-face window DiagnosticWarning default+u
+
+    echo -debug "Enabling LSP for filetype %opt{filetype}"
+
+    #############################################################
+    # Add the following flag for debugging
+    # --log ~/.config/kak-lsp/kak-lsp.log
+    #############################################################
+    set-option global lsp_cmd "kak-lsp -vvv -c ~/.config/kak-lsp/kak-lsp.toml -s %val{session}"
+
+    # for python. Can't configure python in kak-lsp.toml.
+    set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
+
+    hook global KakEnd .* lsp-exit
+}
+
 # sets tabs to 8 spaces for go
 hook global WinSetOption filetype=go %{
     set-option window indentwidth 8
@@ -85,6 +116,13 @@ hook global WinSetOption filetype=python %{
 
     hook buffer BufWritePost .* %{
         lint
+    }
+}
+
+hook global WinSetOption filetype=rust %{
+    hook window -group rust-inlay-hints BufWritePost .* rust-analyzer-inlay-hints
+    hook -once -always window WinSetOption filetype=.* %{
+        remove-hooks window rust-inlay-hints
     }
 }
 
@@ -148,6 +186,17 @@ map global normal '`' ': enter-user-mode<space>case<ret>'
 
 plug "chriswalker/golang.kak"
 
+
+# #############################################################
+# # Add the following flag for debugging
+# # --log ~/.config/kak-lsp/kak-lsp.log
+# #############################################################
+# set-option global lsp_cmd "kak-lsp -vvv -c ~/.config/kak-lsp/kak-lsp.toml -s %val{session}"
+
+# # for python. Can't configure python in kak-lsp.toml.
+# set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
+
+# hook global KakEnd .* lsp-exit
 plug "h-youhei/kakoune-surround" config %{
     declare-user-mode surround
     map global surround s ':surround<ret>' -docstring 'surround'
@@ -211,39 +260,6 @@ plug "andreyorst/fzf.kak" config %{
     set global fzf_grep_command 'rg'
 }
 
-#############################################################
-# LSP settings
-#############################################################
-plug "kak-lsp/kak-lsp" do %{
-    cargo install --locked --force --path .
-} config %{
-    hook global WinSetOption filetype=(javascript|typescript|go|python|css|scss|html|json|yaml) %{
-        map window user "l" ": enter-user-mode lsp<ret>" -docstring "LSP mode"
-
-        lsp-enable-window
-        lsp-auto-hover-enable
-
-        set-option window lsp_hover_anchor false
-        set-option window lsp_hover_max_lines 10
-
-        set-face window DiagnosticError red,default+i
-        set-face window DiagnosticHint yellow,default+i
-        set-face window DiagnosticWarning default+u
-
-        echo -debug "Enabling LSP for filetype %opt{filetype}"
-    }
-
-    #############################################################
-    # Add the following flag for debugging
-    # --log ~/.config/kak-lsp/kak-lsp.log
-    #############################################################
-    set-option global lsp_cmd "kak-lsp -vvv -c ~/.config/kak-lsp/kak-lsp.toml -s %val{session}"
-
-    # for python. Can't configure python in kak-lsp.toml.
-    set-option global lsp_server_configuration pyls.configurationSources=["flake8"]
-
-    hook global KakEnd .* lsp-exit
-}
 
 plug "krornus/kakoune-toggle-map" %{
     plug "krornus/kakoune-hlsearch" %{
